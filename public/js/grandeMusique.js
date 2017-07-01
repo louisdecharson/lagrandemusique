@@ -82,7 +82,6 @@ function onYouTubePlayerAPIReady() {
         $('#song-title').text(songs[compteur].title);
         var id = '#' + songs[compteur].id;
         $(id).css('font-weight','bold');
-        e.target.playVideo();
         $('#table').css('margin-top',$('#my-player').outerHeight()+'px');
     }
 
