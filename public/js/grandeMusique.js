@@ -60,6 +60,8 @@ function onYouTubePlayerAPIReady() {
     if (mOS === 'iOS') {
         $('iframe').css('height','300px');
         $('iframe').css('width','300px');
+        var url = $('iframe').attr('src')+'&playsinline=1';
+        $('iframe').attr('src',url);
     }
     function playSong(c) {
         player.loadVideoById(songs[c].id,0,"default");
