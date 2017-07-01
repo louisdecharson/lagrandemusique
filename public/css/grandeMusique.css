@@ -1,0 +1,42 @@
+#song-title {
+    font-size: 3vw;
+    font-family: Helvetica, Arial;
+    font-weight: bold;
+    cursor: pointer;
+    cursor: hand;
+}
+#time {
+    font-size: 2vw;
+    margin-bottom: 0;
+}
+hr {
+    margin-top: 0;
+}
+#my-player {
+    left: 0%;
+    top: 0%;
+    position:fixed;
+    width:100%;
+    padding-left: 10%;
+    padding-top: 5%;
+    background-color: white;
+}
+
+.icon {
+    padding-right: 2vw;
+}
+
+table {
+    margin-top: 25%;
+    margin-left: 10vw;
+    font-size: 2vw;
+}
+table thead th {
+    border-bottom: 0.1px solid #000;
+}
+
+td {
+    cursor: pointer;
+    cursor: hand;
+}
+

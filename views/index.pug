@@ -1,0 +1,25 @@
+extends layout
+
+block content
+        div(id="my-player")
+                p(id='song-title') 
+                span(id="playIcon" class="icon fa fa-play fa-2x" aria-hidden="true")
+                span(id="nextIcon" class="icon fa fa-step-forward fa-2x" aria-hidden="true")
+                p(id='time')
+                div(id='embed-player')
+                hr
+        table(id='table')
+                thead
+                        th Songs
+                        // th Url
+                tbody
+                        for song in songs
+                                tr
+                                        td(class='song-title' id=song.id)= song.title 
+                                        td
+                                                // a(href="https://youtube.com/watch?v="+song.id) Lien vers youtube
+                                                span(class='song-id' style='display:none')= song.id
+
+block scripts
+        script(src="http://www.youtube.com/player_api")
+        script(src="./public/js/grandeMusique.js")
