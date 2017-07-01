@@ -2,12 +2,10 @@
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the MIT License
 
-var youtubeStream = require('youtube-audio-stream'),
-    express = require('express'),
+var express = require('express'),
     path = require('path'),
     cheerio = require('cheerio'),
     request = require('request'),
-    decoder = require('lame').Decoder,
     bodyParser = require('body-parser'),
     fs = require('fs'),
     speaker = require('speaker');
@@ -132,19 +130,3 @@ app.get('/dl_songs',function(req,res) {
         } 
     });
 });
-
-
-// var getAudio = function (req, res) {
-//     var requestUrl = 'http://youtube.com/watch?v=' + req.params.videoId;
-//     try {
-//         youtubeStream(requestUrl).pipe(res);
-//     } catch (exception) {
-//         res.status(500).send(exception);
-//     }
-// };
-// var stream = youtubeStream(youtubeUrl).pipe(res);
-// stream.on('finish', function() {
-//     cursor ++;
-// });
-
-
