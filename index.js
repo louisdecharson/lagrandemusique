@@ -7,8 +7,7 @@ var express = require('express'),
     cheerio = require('cheerio'),
     request = require('request'),
     bodyParser = require('body-parser'),
-    fs = require('fs'),
-    speaker = require('speaker');
+    fs = require('fs');
  
 
 const app = express();
