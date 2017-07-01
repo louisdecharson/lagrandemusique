@@ -8,6 +8,22 @@ $('.song-title').each(function(it,ind){
     songs.push({"title":title,"id":id});
 });
 
+function getMobileOperatingSystem() {
+  var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      // Windows Phone must come first because its UA also contains "Android"
+    if (/windows phone/i.test(userAgent)) {
+        return "Windows Phone";
+    }
+    if (/android/i.test(userAgent)) {
+        return "Android";
+    }
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return "iOS";
+    }
+    return "unknown";
+}
+var mOS = getMobileOperatingSystem();
+
 function toggleButton(play) {
     var glyphicon = play ? "fa-pause" : "fa-play";
     var notGlyph = play ? "fa-play" : "fa-pause";
@@ -41,6 +57,10 @@ function onYouTubePlayerAPIReady() {
             'onError': onError
         }
     });
+    if (mOS === 'iOS') {
+        $('iframe').css('height','300px');
+        $('iframe').css('width','300px');
+    }
     function playSong(c) {
         player.loadVideoById(songs[c].id,0,"default");
         $('#song-title').text(songs[c].title);
@@ -106,5 +126,6 @@ function onYouTubePlayerAPIReady() {
         playSong(compteur);
     };
 };
+
 
 
