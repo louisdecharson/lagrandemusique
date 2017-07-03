@@ -24,6 +24,8 @@ hr {
 
 .icon {
     padding-right: 2vw;
+    cursor: pointer;
+    cursor: hand;
 }
 
 table {

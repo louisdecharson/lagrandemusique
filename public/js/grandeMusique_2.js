@@ -1,5 +1,7 @@
 var iconPlay = $('#playIcon');
 var iconNext = $('#nextIcon');
+var iconRandom = $('#randomIcon');
+var random = false;
 var compteur = 0;
 var songs = [];
 
@@ -85,6 +87,16 @@ function onYouTubePlayerAPIReady() {
         console.log('compteur: ',compteur);
         $('#song-title').text($(hashid).text());
     }
+    function NextSong() {
+        if (random === true){
+            compteur = Math.floor(Math.random()*songs.length);
+        } else if (compteur < songs.length) {
+            compteur ++;
+        } else {
+            compteur = 0;
+        }
+        playSong(compteur);
+    }
     iconPlay.click(function(){
         if (player.getPlayerState() === YT.PlayerState.PLAYING || player.getPlayerState() === YT.PlayerState.BUFFERING) {
             player.pauseVideo();
@@ -95,12 +107,16 @@ function onYouTubePlayerAPIReady() {
         }
     });
     iconNext.click(function(){
-        if (compteur < songs.length) {
-            compteur ++;
+        NextSong();
+    });
+    iconRandom.click(function(){
+        if (random) {
+            random = false;
+            iconRandom.css('color','black');
         } else {
-            compteur = 0;
+            random = true;
+            iconRandom.css('color','#0084ff');
         }
-        playSong(compteur);
     });
     function onReady(e) {
         $('#song-title').text(songs[compteur].title);

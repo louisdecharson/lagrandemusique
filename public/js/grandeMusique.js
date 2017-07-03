@@ -1,7 +1,10 @@
 var iconPlay = $('#playIcon');
 var iconNext = $('#nextIcon');
+var iconRandom = $('#randomIcon');
+var random = false;
 var compteur = 0;
 var songs = [];
+
 $('.song-title').each(function(it,ind){
     var title = $(this).text(),
         id = $(this).next().find('.song-id').text();
@@ -79,6 +82,16 @@ function onYouTubePlayerAPIReady() {
         console.log('compteur: ',compteur);
         $('#song-title').text($(hashid).text());
     }
+    function NextSong() {
+        if (random === true){
+            compteur = Math.floor(Math.random()*songs.length);
+        } else if (compteur < songs.length) {
+            compteur ++;
+        } else {
+            compteur = 0;
+        }
+        playSong(compteur);
+    }
     iconPlay.click(function(){
         if (player.getPlayerState() === YT.PlayerState.PLAYING || player.getPlayerState() === YT.PlayerState.BUFFERING) {
             player.pauseVideo();
@@ -89,13 +102,20 @@ function onYouTubePlayerAPIReady() {
         }
     });
     iconNext.click(function(){
-        if (compteur < songs.length) {
-            compteur ++;
-        } else {
-            compteur = 0;
-        }
-        playSong(compteur);
+        NextSong();
     });
+
+    iconRandom.click(function(){
+        if (random) {
+            random = false;
+            iconRandom.css('color','black');
+        } else {
+            random = true;
+            iconRandom.css('color','#0084ff');
+        }
+    });
+    
+    
     $('.song-title').click(function(){
         var id = $(this).next().find('.song-id').text();
         playSongbyId(id);
@@ -110,8 +130,7 @@ function onYouTubePlayerAPIReady() {
     function onPlayerStateChange(event) {
         if (event.data === YT.PlayerState.ENDED) {
             clearTimeout(mytimer);
-            compteur++;
-            playSong(compteur);
+            NextSong();
         } else if (event.data == YT.PlayerState.PLAYING) {
             toggleButton(true);
             mytimer = setInterval(function() {
