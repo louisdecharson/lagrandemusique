@@ -11,12 +11,19 @@
   <body>
     <div id="my-player">
       <p id="song-title"></p>
-      <span class="icon fa fa-play fa-2x" id="playIcon" aria-hidden="true"></span>
-      <span class="icon fa fa-step-forward fa-2x" id="nextIcon" aria-hidden="true"></span>
-      <span class="icon fa fa-random fa-2x" id="randomIcon" aria-hidden="true"></span>
-      <p id="time"></p>
+      <div>
+        <span class="icon fa fa-play fa-2x" id="playIcon" aria-hidden="true"></span>
+        <span class="icon fa fa-step-forward fa-2x" id="nextIcon" aria-hidden="true"></span>
+        <span class="icon fa fa-random fa-2x" id="randomIcon" aria-hidden="true"></span>
+        <span id="time"></span>
+      </div>
+      <div id="progressBar">
+        <span class="icon fa fa-caret-down fa-lg" id="caret" aria-hidden="true"></span>
+        <div id="myProgress">
+          <div id="myBar"></div>
+        </div>
+      </div>
       <div id="embed-player"></div>
-      <hr/>
     </div>
     <table id="table">
       <thead>

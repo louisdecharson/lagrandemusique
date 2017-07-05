@@ -122,28 +122,49 @@ function onYouTubePlayerAPIReady() {
         $('#song-title').text(songs[compteur].title);
         var id = '#' + songs[compteur].id;
         $(id).css('font-weight','bold');
+        var d = player.getDuration();
+        $('#time').text(getNiceTime(0)+" / "+getNiceTime(d));
         $('#table').css('margin-top',$('#my-player').outerHeight()+'px');
     }
+    function progressBar(a) {
+        var caret = $('#caret'),
+            bar = $('#myBar');
+        caret.css('padding-left',a+'%');
+        bar.css('width',a+'%');
+    }
+    $('#myProgress').click(function(e) {
+        var posX = (e.pageX - $(this).offset().left)/$(this).width(),
+            d = player.getDuration();
+        player.seekTo(d*posX);
+    });
+
+    $('#caret').click(function(e) {
+        var posX = (e.pageX - $(this).offset().left)/$('#myProgress').width(),
+            d = player.getDuration();
+        player.seekTo(d*posX);
+    });
 
     function onPlayerStateChange(event) {
         if (event.data === YT.PlayerState.ENDED) {
             clearTimeout(mytimer);
-            compteur++;
-            playSong(compteur);
+            progressBar(0);
+            NextSong();
         } else if (event.data == YT.PlayerState.PLAYING) {
             toggleButton(true);
             mytimer = setInterval(function() {
                 $('#table').css('margin-top',$('#my-player').outerHeight()+'px');
-                $('#time').text(getNiceTime(player.getCurrentTime())+" / "+getNiceTime(player.getDuration()));
-            },1000);
+                var cT = player.getCurrentTime(),
+                    d = player.getDuration();
+                $('#time').text(getNiceTime(cT)+" / "+getNiceTime(d));
+                progressBar(100*cT/d);
+            },10);
         } else if (event.data == YT.PlayerState.PAUSED) {
             toggleButton(false);
         }
     };
     function onError(e) {
         $('#song-title').text(Error);
-        compteur ++;
-        playSong(compteur);
+        NextSong();
     };
 };
 
