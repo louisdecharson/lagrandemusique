@@ -112,10 +112,12 @@ function onYouTubePlayerAPIReady() {
     iconRandom.click(function(){
         if (random) {
             random = false;
-            iconRandom.css('color','black');
+            iconRandom.css('color','#373a3c');
+            // iconRandom.css('background-color','#FFFFFF');
         } else {
             random = true;
-            iconRandom.css('color','#0084ff');
+            // iconRandom.css('background-color','#8E8E93');
+            iconRandom.css('color','#007AFF');
         }
     });
     function onReady(e) {

@@ -4,13 +4,13 @@
 
 var express = require('express'),
     path = require('path'),
-    cheerio = require('cheerio'),
-    request = require('request'),
+    tumblr = require('tumblr.js'),
     bodyParser = require('body-parser'),
     fs = require('fs');
  
-
+require('dotenv').config({path:path.join(__dirname,'/.env')});
 const app = express();
+const blog = "lagrandemusique.tumblr.com";
 const tumblrUrl = "http://lagrandemusique.tumblr.com";
 const yt = "https://youtube.com/";
 const songsList = require('./public/json/songs.json');
@@ -28,75 +28,6 @@ var server = app.listen(process.env.PORT || 8080, function () {
 });
 
 // =============================================================================
-function getPage(pageUrl,callback){
-      request(pageUrl,function(e,r,b) {
-          if (r.statusCode >=200 && r.statusCode < 400 && !e) {
-              var $ = cheerio.load(b),
-                  texte = $('.pagination').text(),
-                  nbPages = parseInt(texte.substring(texte.indexOf('1')+4,texte.indexOf('1')+7));
-              callback(null,nbPages);
-          } else {
-              callback(new Error('Unable to fetch Tumblr'));
-          }
-      });
-};
-function getSongs(pageNb,callback){
-    var arraySongs = [];
-    var pageUrl = tumblrUrl + '/page/' + pageNb;
-    request(pageUrl,function(e,r,b) {
-        if (r.statusCode >=200 && r.statusCode < 400 && !e) {
-            var $ = cheerio.load(b),
-                posts = $('.post');
-            for (var cursor=0; cursor < posts.length; cursor++) {
-                try {
-                    var post = posts.eq(cursor),
-                        embedUrl = post.children('.video').children('iframe').attr('src'),
-                        youtubeId = embedUrl.substring(embedUrl.indexOf('embed')+6,embedUrl.indexOf('?')),
-                        title =  post.children('.video').children('p').text();
-                    var song = {
-                        "title": title,
-                        "id": youtubeId
-                    };
-                    arraySongs.push(song);
-                }
-                catch(error){
-                }
-                if (cursor+1 === posts.length) {
-                    callback(null,arraySongs);
-                }
-            }
-        } else {
-            callback(new Error('Unable to fetch Tumblr videos'));
-        }
-    });  
-}
-function getAllSongs(url,songs,callback){
-    songs = JSON.parse(songs);
-    getPage(url,function(error,nbPages) {
-        if (!error) {
-            var added = 0;
-            for (var page=1;page<nbPages;page++){
-                getSongs(page,function(err,newSongs){
-                    if (!err){
-                        songs['Songs'] = songs['Songs'].concat(newSongs);
-                        if (++added === nbPages-1) {
-                            callback(null,songs);
-                        } else {
-                            console.log(added);
-                        }
-                    } else {
-                        callback(err);
-                        console.log(err);
-                        return;
-                    }
-                });
-            }
-        } else {
-            callback(error);
-        }
-    });
-}
-
 function writeSongs(songs,callback) {
     fs.writeFile('./public/json/songs.json', JSON.stringify(songs), function (err) {
         if (err) {
@@ -105,6 +36,59 @@ function writeSongs(songs,callback) {
             callback(null);
         }
     });
+}
+const client = tumblr.createClient({
+    consumer_key: process.env.TUMBLR_CONSUMER_KEY
+});
+
+function downloadSongs(songs,callback) {
+    songs = JSON.parse(songs);
+    console.log('Download all the songs');
+    var totalPosts;
+    var offset = 0;
+    var onComplete = function(remainingSongs,previousOffset) {
+        console.log("REMAINING SONGS: " + remainingSongs);
+        if (remainingSongs === 0) {
+            callback(false,songs);
+        } else {
+            download(previousOffset+50);
+        }
+    }; 
+    var download = function (offset) {
+        console.log('============================');
+        client.blogPosts(blog,{ type: 'video', limit: 1000, offset: offset.toString()},function(err,data) {
+            if (err) {
+                console.log('ERROR with Tumblr API. Message:' + data.meta.msg);
+                callback(new Error(err));
+            } else {
+                totalPosts = data.total_posts;
+                var posts = data.posts;
+                var postsToGo = posts.length;
+                console.log('Songs to be downloaded: ' + postsToGo);
+                if (postsToGo === 0) {
+                    onComplete(totalPosts-offset-posts.length,offset);
+                } else {
+                    posts.forEach(function(post) {
+                        try {
+                            var song = {
+                                "title": post.summary,
+                                "id": post.video.youtube.video_id
+                            };
+                            songs['Songs'].push(song);
+                        }
+                        catch(error) {
+                            console.log('ERROR | ' + postsToGo + '. ' + error);
+                        }
+                        console.log('Song: ' + postsToGo + '/' + posts.length);
+                        if (--postsToGo === 0) {
+                            onComplete(totalPosts-offset-posts.length,offset);
+                        }
+                    });
+                }
+            } 
+        });
+    };
+    download(offset);
 }
 
 
@@ -115,7 +99,7 @@ app.get('/',function(req,res) {
 });
 
 app.get('/dl_songs',function(req,res) {
-    getAllSongs(tumblrUrl,'{"Songs":[]}',function(error,songs) {
+    downloadSongs('{"Songs":[]}',function(error,songs) {
         if (!error) {
             writeSongs(songs,function(err) {
                 if (!err) {
@@ -129,3 +113,17 @@ app.get('/dl_songs',function(req,res) {
         } 
     });
 });
+    // getAllSongs(tumblrUrl,'{"Songs":[]}',function(error,songs) {
+    //     if (!error) {
+    //         writeSongs(songs,function(err) {
+    //             if (!err) {
+    //                 res.send('Songs successfully loaded');
+    //             } else {
+    //                 res.status(500).send(err.message);
+    //             }
+    //         });
+    //     } else {
+    //         res.status(500).send(error.message);
+    //     } 
+    // });
+// });
