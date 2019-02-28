@@ -39,7 +39,7 @@ function getNiceTime(time) {
 
 function onYouTubePlayerAPIReady() {
     var player;
-    $.getJSON('https://cdn.rawgit.com/louisdecharson/9f0818029a0ef1569dcbc7f9223cc97c/raw/3be64c1e3cf1809c74a33a23e980016b5d85a739/grandemusique.json', function(data){
+    $.getJSON('https://raw.githubusercontent.com/louisdecharson/lagrandemusique/master/public/json/songs.json', function(data){
         data.Songs.forEach(function(it,ind) {
             $('tbody').append('<tr><td class="song-title" id="'+it.id+'">'+it.title+'</td><td><span class="song-id" style="display:none">'+it.id+'</span></tr>');
             songs.push({"title":it.title,"id":it.id});
